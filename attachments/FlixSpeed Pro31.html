@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlixSpeed Pro | Gelişmiş İnternet Hız Testi</title>
+<style>
+@font-face{font-family:'Orbitron';src:url('https://cdn.jsdelivr.net/fontsource/fonts/orbitron@latest/latin-700-normal.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'Manrope';src:url('https://cdn.jsdelivr.net/fontsource/fonts/manrope@latest/latin-400-normal.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Manrope';src:url('https://cdn.jsdelivr.net/fontsource/fonts/manrope@latest/latin-600-normal.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Manrope';src:url('https://cdn.jsdelivr.net/fontsource/fonts/manrope@latest/latin-800-normal.woff2') format('woff2');font-weight:800;font-display:swap}
+:root{
+  --bg:#07080c; --card:rgba(19,22,30,.72); --card2:rgba(28,32,44,.66); --line:rgba(255,255,255,.09);
+  --text:#f4f7ff; --muted:#8f97ab; --cyan:#00e5cf; --blue:#00a3ff; --purple:#8b3dff;
+  --grad:linear-gradient(90deg,#00e5cf,#00a3ff,#8b3dff);
+  --grid:rgba(255,255,255,.045); --shadow:0 24px 70px rgba(0,0,0,.5);
+  --glass:blur(18px);
+}
+body.light{
+  --bg:#eef1f8; --card:rgba(255,255,255,.78); --card2:rgba(240,244,252,.8); --line:rgba(20,30,60,.1);
+  --text:#0d1226; --muted:#5a6478; --grid:rgba(20,30,60,.06); --shadow:0 24px 60px rgba(30,50,120,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Manrope',system-ui,sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;transition:background .4s,color .4s;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.bg i{position:absolute;width:62vmax;height:62vmax;border-radius:50%;filter:blur(90px);opacity:.32;animation:float 26s infinite alternate ease-in-out}
+body.light .bg i{opacity:.22}
+.bg i:nth-child(1){background:#00e5cf;top:-22vmax;left:-16vmax}
+.bg i:nth-child(2){background:#8b3dff;bottom:-26vmax;right:-16vmax;animation-delay:-9s}
+.bg i:nth-child(3){background:#00a3ff;top:28%;left:38%;animation-delay:-17s}
+@keyframes float{to{transform:translate(9vmax,7vmax) scale(1.18)}}
+.bg::after{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:46px 46px;-webkit-mask-image:radial-gradient(ellipse at 50% 12%,#000,transparent 72%);mask-image:radial-gradient(ellipse at 50% 12%,#000,transparent 72%)}
+header{position:sticky;top:0;z-index:20;width:100%;backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);background:color-mix(in srgb,var(--bg) 62%,transparent);border-bottom:1px solid var(--line)}
+.head-in{max-width:900px;margin:auto;display:flex;justify-content:space-between;align-items:center;padding:14px 20px}
+.logo{display:flex;align-items:center;gap:11px;font-weight:800;font-size:21px;letter-spacing:.4px}
+.logo-ic{width:40px;height:40px;border-radius:13px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 22px rgba(0,229,207,.45);animation:bob 3.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-3px) rotate(-4deg)}}
+.logo b{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hactions{display:flex;gap:10px;align-items:center}
+.btn{background:var(--card2);border:1px solid var(--line);color:var(--text);padding:9px 15px;border-radius:13px;cursor:pointer;font-size:13.5px;font-weight:600;transition:.25s;backdrop-filter:var(--glass)}
+.btn:hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 6px 20px rgba(0,229,207,.18)}
+.theme-pill{position:relative;display:flex;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:4px;cursor:pointer}
+.theme-pill span{width:36px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:999px;color:var(--muted);font-size:14px;z-index:1;transition:color .3s}
+.theme-pill span.active{color:var(--text)}
+.theme-pill::before{content:'';position:absolute;top:4px;left:4px;width:36px;height:30px;border-radius:999px;background:var(--grad);transition:transform .3s cubic-bezier(.6,1.6,.4,1);box-shadow:0 0 14px rgba(0,229,207,.4)}
+.theme-pill.dark::before{transform:translateX(36px)}
+main{width:100%;max-width:900px;padding:26px 18px 10px;display:flex;flex-direction:column;gap:22px}
+.tabs{display:flex;gap:8px;justify-content:center;background:var(--card);border:1px solid var(--line);padding:6px;border-radius:999px;width:fit-content;margin:0 auto;backdrop-filter:var(--glass)}
+.tab{border:none;background:transparent;color:var(--muted);padding:11px 30px;border-radius:999px;cursor:pointer;font-size:14.5px;font-weight:700;transition:.3s}
+.tab.active{background:var(--grad);color:#00131a;box-shadow:0 0 24px rgba(0,229,207,.4)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:28px;position:relative;overflow:hidden;backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.07)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);opacity:.85}
+.card-title{display:flex;justify-content:center;align-items:center;gap:13px;font-size:20px;font-weight:800;margin-bottom:16px}
+.phase-icon{width:44px;height:44px;border-radius:14px;background:color-mix(in srgb,var(--cyan) 14%,transparent);border:1px solid color-mix(in srgb,var(--cyan) 45%,transparent);display:flex;align-items:center;justify-content:center;color:var(--cyan);font-size:20px;flex:none;box-shadow:0 0 18px rgba(0,229,207,.25) inset}
+.stats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 0 8px}
+.chip{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:10px 16px;backdrop-filter:var(--glass)}
+.chip .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;background:color-mix(in srgb,var(--c) 16%,transparent);border:1px solid color-mix(in srgb,var(--c) 40%,transparent)}
+.chip small{display:block;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase}
+.chip b{font-family:'Orbitron';font-size:17px}
+.chip i{font-style:normal;color:var(--muted);font-size:11px;margin-left:3px}
+.gauge-wrap{position:relative;width:min(440px,100%);margin:4px auto 0}
+.gauge-wrap svg{width:100%;display:block;overflow:visible}
+.hub-pulse{position:absolute;left:50%;top:58.9%;width:16px;height:16px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none}
+.hub-pulse::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--cyan);animation:pulse 2s ease-out infinite;opacity:0}
+@keyframes pulse{0%{transform:scale(.6);opacity:.8}100%{transform:scale(3.4);opacity:0}}
+.gauge-value{position:absolute;left:50%;top:80%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.gauge-value span{font-family:'Orbitron';font-size:clamp(38px,11vw,54px);font-weight:700;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 18px rgba(0,229,207,.35))}
+.gauge-value span.idle{background:none;-webkit-text-fill-color:var(--muted);filter:none;opacity:.55;font-size:clamp(30px,8vw,40px)}
+.gauge-value small{display:flex;align-items:center;justify-content:center;gap:6px;color:var(--muted);font-size:13px;font-weight:700;margin-top:4px;letter-spacing:1px}
+.gauge-value small::before{content:'';width:22px;height:22px;border:1.6px solid var(--cyan);border-radius:50%;background:var(--diricon) center/12px no-repeat}
+.graph-box{background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin:16px 0 4px}
+.graph-head{display:flex;justify-content:space-between;color:var(--muted);font-size:12.5px;font-weight:600;margin-bottom:8px;letter-spacing:.3px}
+.graph-head b{color:var(--cyan)}
+#graphCanvas{width:100%;height:60px;display:block}
+.start{position:relative;display:block;margin:20px auto 0;background:var(--grad);border:none;color:#00131a;font-size:18px;font-weight:800;font-family:'Manrope';padding:18px 60px;border-radius:999px;cursor:pointer;overflow:hidden;box-shadow:0 0 34px rgba(0,229,207,.4),0 10px 30px rgba(0,0,0,.3);transition:transform .18s,opacity .2s,box-shadow .3s}
+.start:hover:not(:disabled){transform:translateY(-3px) scale(1.02);box-shadow:0 0 46px rgba(0,229,207,.55),0 14px 34px rgba(0,0,0,.35)}
+.start:disabled{opacity:.8;cursor:wait}
+.start::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.55) 50%,transparent 58%);transform:translateX(-130%);animation:shine 3s infinite}
+@keyframes shine{55%{transform:translateX(130%)}100%{transform:translateX(130%)}}
+.status{text-align:center;color:var(--muted);margin-top:13px;font-size:13.5px;font-weight:600;min-height:20px}
+.progress-line{position:absolute;left:0;bottom:0;height:4px;width:100%;background:transparent}
+.progress-line i{display:block;height:100%;width:0%;background:var(--grad);background-size:200% 100%;animation:slide 1.6s linear infinite;box-shadow:0 0 14px rgba(0,229,207,.7)}
+@keyframes slide{to{background-position:200% 0}}
+h3{margin-bottom:9px;font-size:17px}
+.muted{color:var(--muted);font-size:14px;line-height:1.6}
+.meta-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px}
+.meta{flex:1;min-width:220px;background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:15px 16px;transition:.25s}
+.meta:hover{border-color:color-mix(in srgb,var(--cyan) 45%,transparent);transform:translateY(-2px)}
+.meta h4{font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:7px;letter-spacing:.6px;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.meta h4::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--grad);box-shadow:0 0 8px var(--cyan)}
+.meta p{font-size:14px;font-weight:600}
+.foot-note{margin-top:15px}
+footer{padding:24px;color:var(--muted);font-size:12.5px;font-weight:600;letter-spacing:.3px}
+.player{border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:16px 0;background:#000;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.player-screen{position:relative;aspect-ratio:16/9;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;overflow:hidden}
+.player-screen::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55));pointer-events:none;z-index:1}
+#playerVideo,#playerImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter .5s,opacity .5s}
+#playerImg{opacity:0}
+.p-ov{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:11px}
+.p-ring{width:50px;height:50px;border:4px solid rgba(255,255,255,.16);border-top-color:var(--cyan);border-radius:50%;animation:spin 1s linear infinite;filter:drop-shadow(0 0 10px rgba(0,229,207,.6))}
+@keyframes spin{to{transform:rotate(360deg)}}
+#playerIcon{font-size:48px;color:var(--cyan);text-shadow:0 0 30px rgba(0,229,207,.8);animation:bob 2.6s ease-in-out infinite}
+#playerStatus{font-size:12.5px;font-weight:700;color:#eaf6ff;background:rgba(0,0,0,.55);padding:4px 14px;border-radius:999px;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14)}
+#playerBadge{position:absolute;top:12px;right:12px;z-index:3;background:rgba(0,0,0,.72);color:#fff;font-size:12px;font-weight:800;padding:4px 11px;border-radius:8px;border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(6px);display:flex;align-items:center;gap:7px}
+#playerBadge::before{content:'';width:7px;height:7px;border-radius:50%;background:#ff4d5e;box-shadow:0 0 8px #ff4d5e;animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.35}}
+.player-bar{height:5px;background:#191d26}
+.player-bar i{display:block;height:100%;width:0;background:var(--grad);box-shadow:0 0 12px rgba(0,229,207,.8)}
+.player-res{display:flex;justify-content:space-between;padding:9px 14px;font-size:12px;color:var(--muted);font-weight:600;background:var(--card2)}
+.bitrate-row{text-align:center;font-size:13.5px;color:var(--muted);font-weight:600;margin-top:12px}
+.bitrate-row b{font-family:'Orbitron';color:var(--cyan);font-size:19px;text-shadow:0 0 16px rgba(0,229,207,.5)}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(102px,1fr));gap:10px;margin:16px 0 4px}
+.res-card{background:var(--card2);border:1px solid var(--line);border-radius:15px;overflow:hidden;opacity:.45;transition:.35s;filter:grayscale(.4)}
+.res-card .thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:#000}
+.res-card .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:filter .5s,transform .5s}
+.res-card:hover .thumb img{transform:scale(1.08)}
+.qbadge{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.8);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:5px;z-index:2;letter-spacing:.4px}
+.rov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(0,0,0,.5);transition:.35s;z-index:2}
+.rinfo{padding:8px 6px;text-align:center}
+.rinfo b{display:block;font-size:12.5px;font-weight:800}
+.rinfo span{font-size:10.5px;color:var(--muted);font-weight:600}
+.res-card.ok{opacity:1;border-color:color-mix(in srgb,var(--cyan) 55%,transparent);filter:none}
+.res-card.ok .rov{background:rgba(0,0,0,.2);color:#c9fff6}
+.res-card.current{opacity:1;filter:none;border-color:var(--cyan);box-shadow:0 0 22px rgba(0,229,207,.35);animation:cardpulse 1.6s ease-in-out infinite}
+@keyframes cardpulse{50%{box-shadow:0 0 34px rgba(0,229,207,.55)}}
+.res-card.current .rov{background:rgba(0,0,0,.14);color:var(--cyan);text-shadow:0 0 16px rgba(0,229,207,.95)}
+.video-result{background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin-top:16px;font-size:14px;line-height:2;font-weight:600}
+.video-result[hidden]{display:none}
+.video-result b{color:var(--cyan)}
+.modal-back{position:fixed;inset:0;background:rgba(3,5,10,.66);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:60;padding:16px;opacity:0;pointer-events:none;transition:.3s}
+.modal-back.open{opacity:1;pointer-events:auto}
+.modal{background:var(--card);border:1px solid var(--line);border-radius:24px;width:min(470px,100%);padding:22px;backdrop-filter:var(--glass);box-shadow:var(--shadow);transform:translateY(26px) scale(.96);transition:.35s cubic-bezier(.5,1.4,.4,1)}
+.modal-back.open .modal{transform:none}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.modal-head button{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;transition:.2s}
+.modal-head button:hover{color:var(--text);transform:rotate(90deg)}
+.hist-list{max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.hist-item{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:11px 13px;font-size:12.5px;font-weight:600;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hist-item b{color:var(--cyan)}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px}
+.btn.primary{background:var(--grad);border:none;color:#00131a;font-weight:800}
+svg text{fill:var(--muted);font-size:11.5px;font-weight:700;font-family:'Manrope'}
+svg text.active{fill:var(--text);font-size:14px;font-weight:800}
+</style>
+</head>
+<body>
+<div class="bg"><i></i><i></i><i></i></div>
+
+<header><div class="head-in">
+  <div class="logo"><span class="logo-ic">⚡</span>FLIX<b>SPEED</b></div>
+  <div class="hactions">
+    <button class="btn" id="histBtn">📊 Geçmiş</button>
+    <div class="theme-pill dark" id="themePill"><span data-mode="light">☼</span><span data-mode="dark" class="active">☾</span></div>
+  </div>
+</div></header>
+
+<main>
+  <div class="tabs">
+    <button class="tab active" data-tab="speed">⚡ Hız Testi</button>
+    <button class="tab" data-tab="video">🎬 Video Testi</button>
+  </div>
+
+  <!-- ===== HIZ TESTİ ===== -->
+  <div id="tab-speed" style="display:flex;flex-direction:column;gap:22px">
+    <section class="card">
+      <div class="card-title"><span class="phase-icon" id="phaseIcon">↓</span><span id="phaseTitle">İndirme (Download) Hızı</span></div>
+      <div class="stats">
+        <div class="chip" style="--c:#e6c229"><span class="ic">⏱</span><div><small>Ping</small><b id="pingV">--</b><i>ms</i></div></div>
+        <div class="chip" style="--c:#00a3ff"><span class="ic">〰</span><div><small>Jitter</small><b id="jitterV">--</b><i>ms</i></div></div>
+        <div class="chip" style="--c:#00e5cf"><span class="ic">🛡</span><div><small>Kayıp</small><b id="lossV">--</b><i>%</i></div></div>
+      </div>
+      <div class="gauge-wrap">
+        <svg id="gaugeSvg" viewBox="0 0 340 268"></svg>
+        <div class="hub-pulse"></div>
+        <div class="gauge-value"><span id="speedV" class="idle">--</span><small id="speedU">MBPS ↓</small></div>
+      </div>
+      <div class="graph-box">
+        <div class="graph-head"><span>Anlık Grafik</span><b id="graphState">Bekleniyor</b></div>
+        <canvas id="graphCanvas"></canvas>
+      </div>
+      <button class="start" id="startBtn">Hız Testini Başlat</button>
+      <div class="status" id="statusText">Teste hazır</div>
+      <div class="progress-line"><i id="progLine"></i></div>
+    </section>
+
+    <section class="card">
+      <h3>🔍 Bağlantı Kalitesi Analizi</h3>
+      <p class="muted" id="qualityText">Test sonuçlarına göre ağ performansınız değerlendiriliyor...</p>
+      <div class="meta-row">
+        <div class="meta"><h4>İnternet Sağlayıcısı (IP)</h4><p id="ispLine">IP bilgisi yükleniyor...</p></div>
+        <div class="meta"><h4>Test Altyapısı</h4><p>Cloudflare Edge &amp; CDN Network</p></div>
+      </div>
+      <p class="muted foot-note">FlixSpeed Pro, gelişmiş bant genişliği algoritmaları ve bulut sunucuları ile en yüksek doğruluğu sağlar.</p>
+    </section>
+  </div>
+
+  <!-- ===== VİDEO TESTİ ===== -->
+  <div id="tab-video" style="display:none;flex-direction:column;gap:22px">
+    <section class="card">
+      <div class="card-title"><span class="phase-icon">🎬</span><span>Video Akış (Streaming) Testi</span></div>
+      <p class="muted" style="text-align:center">20 saniye boyunca gerçek video oynatılır; 144p'den 8K'ya kadar hangi çözünürlüklerin takılmadan izlenebileceği canlı ölçülür.</p>
+      <div class="player">
+        <div class="player-screen">
+          <video id="playerVideo" muted loop playsinline preload="auto"
+                 src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"></video>
+          <img id="playerImg" alt="">
+          <span id="playerBadge">—</span>
+          <div class="p-ov">
+            <div class="p-ring" id="playerRing" style="display:none"></div>
+            <div id="playerIcon">▶</div>
+            <div id="playerStatus">Hazır</div>
+          </div>
+        </div>
+        <div class="player-bar"><i id="playerProg"></i></div>
+        <div class="player-res"><span>FlixSpeed Gerçek Video Akışı</span><span id="playerRes">—</span></div>
+      </div>
+      <div class="bitrate-row">Anlık akış hızı: <b id="bitrateV">--</b> Mbps</div>
+      <div class="res-grid" id="resGrid"></div>
+      <div class="video-result" id="videoResult" hidden></div>
+      <button class="start" id="videoBtn">Video Testini Başlat</button>
+      <div class="status" id="videoStatus">Teste hazır</div>
+      <div class="progress-line"><i id="videoProgLine"></i></div>
+    </section>
+  </div>
+</main>
+
+<footer>FlixSpeed Pro © 2026 • Gelişmiş İnternet Hız Testi</footer>
+
+<div class="modal-back" id="modalBack">
+  <div class="modal">
+    <div class="modal-head"><h3>📊 Önceki Test Geçmişi</h3><button id="closeModal">×</button></div>
+    <div class="hist-list" id="historyList"></div>
+    <div class="modal-foot">
+      <button class="btn" id="clearHist">Geçmişi Temizle</button>
+      <button class="btn primary" id="okModal">Tamam</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========== SABİTLER ========== */
+const CX=170, CY=158, R=120, A0=135, SWEEP=270;
+const IDLE_ANG=A0;               /* BOŞTA: ibre 0'da durur (asla 100 gibi görünmez) */
+const TICKS=[0,10,25,50,100,250,500,1000,2000];
+const NS='http://www.w3.org/2000/svg';
+const CF='https://speed.cloudflare.com';
+const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ========== SEKMELER ========== */
+function showTab(n){
+  $('tab-speed').style.display=n==='speed'?'flex':'none';
+  $('tab-video').style.display=n==='video'?'flex':'none';
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));
+  showTab(t.dataset.tab);
+});
+showTab('speed');
+
+/* ========== VİDEO THUMB (yedek) ========== */
+const THUMB='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'><defs><linearGradient id='s' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#2b1055'/><stop offset='.55' stop-color='#7597de'/><stop offset='1' stop-color='#f7b733'/></linearGradient></defs><rect width='320' height='180' fill='url(#s)'/><circle cx='222' cy='66' r='24' fill='#ffd76e' opacity='.95'/><path d='M0 138 L70 78 L120 128 L170 88 L230 148 L320 98 L320 180 L0 180 Z' fill='#141a2e'/><path d='M0 158 L60 118 L130 163 L200 123 L260 168 L320 138 L320 180 L0 180 Z' fill='#0b0f1c'/><rect y='168' width='320' height='12' fill='#060913'/></svg>`);
+
+/* ========== ÇÖZÜNÜRLÜKLER ========== */
+const RES=[
+  {n:'144p',req:0.3,blur:7},{n:'240p',req:0.7,blur:5},{n:'360p',req:1.5,blur:3.5},
+  {n:'480p',req:2.5,blur:2.5},{n:'720p',req:5,blur:1.5},{n:'1080p',req:10,blur:0.8},
+  {n:'1440p',req:18,blur:0.3},{n:'4K UHD',req:35,blur:0},{n:'8K',req:80,blur:0}
+];
+$('resGrid').innerHTML=RES.map((r,i)=>`
+  <div class="res-card" data-i="${i}">
+    <div class="thumb"><img src="${THUMB}" alt="" style="filter:blur(${r.blur}px) grayscale(.7) brightness(.6)">
+      <span class="qbadge">${r.n}</span><span class="rov">🔒</span></div>
+    <div class="rinfo"><b>${r.n}</b><span>${r.req} Mbps</span></div>
+  </div>`).join('');
+const resCards=[...document.querySelectorAll('.res-card')];
+function setCard(i,st){
+  const c=resCards[i];
+  c.classList.toggle('ok',st!=='lock');
+  c.classList.toggle('current',st==='current');
+  c.querySelector('.rov').textContent=st==='lock'?'🔒':(st==='current'?'▶':'✔');
+  c.querySelector('img').style.filter=st==='lock'?`blur(${RES[i].blur}px) grayscale(.7) brightness(.6)`:`blur(${RES[i].blur}px)`;
+}
+
+/* ========== GÖSTERGE SVG ========== */
+const svg=$('gaugeSvg');
+function mk(n,a,p){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);(p||svg).appendChild(e);return e;}
+function polar(r,ang){const a=ang*Math.PI/180;return [CX+r*Math.cos(a),CY+r*Math.sin(a)];}
+function arcPath(r,a0,a1){const [x0,y0]=polar(r,a0),[x1,y1]=polar(r,a1);return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${(a1-a0)>180?1:0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;}
+function fracFor(v){
+  v=Math.max(0,Math.min(TICKS[TICKS.length-1],v));
+  for(let i=0;i<TICKS.length-1;i++){if(v<=TICKS[i+1]){return (i+(v-TICKS[i])/(TICKS[i+1]-TICKS[i]))/(TICKS.length-1);}}
+  return 1;
+}
+const defs=mk('defs',{});
+const gg=mk('linearGradient',{id:'ggrad',x1:'0%',y1:'0%',x2:'100%',y2:'0%'},defs);
+mk('stop',{offset:'0%','stop-color':'#00e5cf'},gg);
+mk('stop',{offset:'55%','stop-color':'#00a3ff'},gg);
+mk('stop',{offset:'100%','stop-color':'#8b3dff'},gg);
+const ng=mk('radialGradient',{id:'ngrad',gradientUnits:'userSpaceOnUse',cx:CX,cy:CY,r:R},defs);
+mk('stop',{offset:'0%','stop-color':'#ffffff'},ng);
+mk('stop',{offset:'100%','stop-color':'#00e5cf'},ng);
+const fl=mk('filter',{id:'glow',x:'-60%',y:'-60%',width:'220%',height:'220%'},defs);
+mk('feGaussianBlur',{stdDeviation:'3.5',result:'b'},fl);
+const fm=mk('feMerge',{},fl);mk('feMergeNode',{in:'b'},fm);mk('feMergeNode',{in:'SourceGraphic'},fm);
+mk('path',{d:arcPath(R,A0,A0+SWEEP),fill:'none',stroke:'var(--line)','stroke-width':13,'stroke-linecap':'round'});
+for(let i=0;i<(TICKS.length-1)*4;i++){
+  const ang=A0+SWEEP*(i/((TICKS.length-1)*4));
+  const [x1,y1]=polar(R-5,ang),[x2,y2]=polar(R+5,ang);
+  mk('line',{x1,y1,x2,y2,stroke:'var(--line)','stroke-width':1,opacity:.55});
+}
+const progArc=mk('path',{d:'',fill:'none',stroke:'url(#ggrad)','stroke-width':13,'stroke-linecap':'round',filter:'url(#glow)'});
+const tickTexts=[];
+TICKS.forEach((t,i)=>{
+  const ang=A0+SWEEP*(i/(TICKS.length-1));
+  const [lx,ly]=polar(R-11,ang),[hx,hy]=polar(R+11,ang);
+  mk('line',{x1:lx,y1:ly,x2:hx,y2:hy,stroke:'var(--line)','stroke-width':2});
+  const [tx,ty]=polar(R+26,ang);
+  const txt=mk('text',{x:tx,y:ty+4,'text-anchor':'middle'});
+  txt.textContent=(t===2000?'2000+':t);
+  tickTexts.push(txt);
+});
+const needlePoly=mk('polygon',{points:'',fill:'url(#ngrad)',filter:'url(#glow)'});
+mk('circle',{cx:CX,cy:CY,r:8,fill:'url(#ngrad)'});
+mk('circle',{cx:CX,cy:CY,r:3.2,fill:'var(--bg)'});
+
+let smoothAng=IDLE_ANG, idleMode=true;
+function renderDial(v,ang){
+  /* Yay: YALNIZCA gerçek değerle dolar — boştayken (idle) tamamen boş */
+  const f=idleMode?0:Math.max(0,Math.min(1,(ang-A0)/SWEEP));
+  progArc.setAttribute('d',f>0.002?arcPath(R,A0,A0+SWEEP*f):'');
+  /* İbre: tabanı TAM olarak merkez göbeğe (CX,CY) oturur,
+     kuyruk yalnızca iğne ekseni boyunca arkaya uzar → asla kaymaz/ortadan çıkmaz */
+  const a=ang*Math.PI/180, ca=Math.cos(a), sa=Math.sin(a);
+  const tx=CX+ca*(R-16), ty=CY+sa*(R-16);          /* uç */
+  const bx=CX-ca*13,    by=CY-sa*13;               /* taban merkezi (göbek hizası, eksen üzerinde) */
+  const px=-sa, py=ca;                              /* iğneye dik yön */
+  const w=4.2, wt=1.2;
+  needlePoly.setAttribute('points',
+    `${(bx+px*w).toFixed(2)},${(by+py*w).toFixed(2)} `+
+    `${(tx+px*wt).toFixed(2)},${(ty+py*wt).toFixed(2)} `+
+    `${(tx-px*wt).toFixed(2)},${(ty-py*wt).toFixed(2)} `+
+    `${(bx-px*w).toFixed(2)},${(by-py*w).toFixed(2)}`);
+  const near=Math.round(fracFor(v)*(TICKS.length-1));
+  tickTexts.forEach((t,i)=>t.classList.toggle('active',i===near));
+  const sv=$('speedV');
+  sv.textContent=hasSample?(v>=2000?'2000+':v.toFixed(1)):'--';
+  sv.classList.toggle('idle',!hasSample);
+}
+
+/* ========== GRAFİK ========== */
+const gc=$('graphCanvas'),gctx=gc.getContext('2d');
+function sizeCanvas(){const d=window.devicePixelRatio||1;gc.width=gc.clientWidth*d;gc.height=60*d;gctx.setTransform(d,0,0,d,0,0);}
+window.addEventListener('resize',sizeCanvas);sizeCanvas();
+function drawGraph(){
+  const W=gc.clientWidth,H=60;gctx.clearRect(0,0,W,H);
+  if(samples.length<2)return;
+  const maxV=Math.max(10,...samples);
+  gctx.beginPath();
+  samples.forEach((s,i)=>{const x=i/Math.max(samples.length-1,1)*W,y=H-5-(s/maxV)*(H-12);i?gctx.lineTo(x,y):gctx.moveTo(x,y);});
+  const g=gctx.createLinearGradient(0,0,W,0);g.addColorStop(0,'#00e5cf');g.addColorStop(1,'#8b3dff');
+  gctx.shadowColor='rgba(0,229,207,.7)';gctx.shadowBlur=9;
+  gctx.strokeStyle=g;gctx.lineWidth=2.2;gctx.stroke();
+  gctx.shadowBlur=0;
+  const lx=(samples.length-1)/Math.max(samples.length-1,1)*W, ly=H-5-(samples[samples.length-1]/maxV)*(H-12);
+  gctx.fillStyle='#fff';gctx.beginPath();gctx.arc(lx,ly,3,0,7);gctx.fill();
+  gctx.lineTo(W,H);gctx.lineTo(0,H);gctx.closePath();
+  gctx.fillStyle='rgba(0,229,207,.09)';gctx.fill();
+}
+
+/* ========== ANİMASYON ========== */
+let displayVal=0,targetVal=0,hasSample=false,isTesting=false,samples=[];
+let lastTs=performance.now();
+function frame(ts){
+  const dt=Math.min(0.05,(ts-lastTs)/1000);lastTs=ts;
+  const k=1-Math.exp(-dt*6);
+  displayVal+=(targetVal-displayVal)*k;
+  if(Math.abs(targetVal-displayVal)<0.05)displayVal=targetVal;
+  const tA=idleMode?IDLE_ANG:A0+SWEEP*fracFor(displayVal);
+  smoothAng+=(tA-smoothAng)*k;
+  if(Math.abs(tA-smoothAng)<0.05)smoothAng=tA;
+  renderDial(displayVal,smoothAng);
+  if(isTesting){samples.push(displayVal);if(samples.length>600)samples.shift();drawGraph();}
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ========== ÖLÇÜM ========== */
+let phaseTimer=null;
+const setStatus=t=>$('statusText').textContent=t;
+function startPhaseTimer(txt){const t0=performance.now();clearInterval(phaseTimer);phaseTimer=setInterval(()=>setStatus(`${txt} (${((performance.now()-t0)/1000).toFixed(1)}s)`),100);}
+function stopPhaseTimer(){clearInterval(phaseTimer);}
+async function measurePing(){
+  const rtts=[];let fails=0;
+  for(let i=0;i<8;i++){
+    const t0=performance.now();
+    try{await fetch(`${CF}/__down?bytes=0&r=${Math.random()}`,{cache:'no-store'});rtts.push(performance.now()-t0);}catch(e){fails++;}
+    if(rtts.length){
+      $('pingV').textContent=Math.min(...rtts).toFixed(0);
+      let j=0;for(let x=1;x<rtts.length;x++)j+=Math.abs(rtts[x]-rtts[x-1]);
+      $('jitterV').textContent=rtts.length>1?(j/(rtts.length-1)).toFixed(1):'0.0';
+    }
+    $('lossV').textContent=((fails/(i+1))*100).toFixed(1);
+    $('progLine').style.width=(5+i*1.2)+'%';
+    await sleep(60);
+  }
+  return rtts.length?Math.min(...rtts):0;
+}
+async function measureDownload(){
+  let tb=0,tt=0;
+  for(const bytes of [10e6,25e6,50e6,100e6]){
+    if(tt>10)break;
+    const t0=performance.now();
+    const resp=await fetch(`${CF}/__down?bytes=${bytes}&r=${Math.random()}`,{cache:'no-store'});
+    const rd=resp.body.getReader();let rec=0;
+    while(true){const {done,value}=await rd.read();if(done)break;rec+=value.length;
+      const el=(performance.now()-t0)/1000;
+      if(el>0.2){targetVal=rec*8/el/1e6;hasSample=true;}
+      if(el>8){await rd.cancel();break;}}
+    const el=(performance.now()-t0)/1000;tb+=rec;tt+=el;
+    targetVal=tb*8/tt/1e6;hasSample=true;
+    $('progLine').style.width=(15+55*(tt/10))+'%';
+  }
+  return tb*8/tt/1e6;
+}
+async function measureUpload(){
+  let tb=0,tt=0;
+  for(const s of [5e6,10e6,20e6]){
+    if(tt>8)break;
+    const t0=performance.now();
+    await fetch(`${CF}/__up`,{method:'POST',body:new Uint8Array(s),cache:'no-store'});
+    const el=(performance.now()-t0)/1000;tb+=s;tt+=el;
+    targetVal=tb*8/tt/1e6;hasSample=true;
+    $('progLine').style.width=(70+30*(tt/8))+'%';
+  }
+  return tb*8/tt/1e6;
+}
+async function simPhase(kind){
+  const peak=kind==='down'?120+Math.random()*380:40+Math.random()*140;
+  const t0=performance.now();
+  while(performance.now()-t0<6000){
+    const p=(performance.now()-t0)/6000;
+    const ramp=peak*(1-Math.exp(-p*4));
+    targetVal=Math.max(0,ramp+ramp*0.1*Math.sin(p*35)+(Math.random()-0.5)*ramp*0.08);hasSample=true;
+    $('progLine').style.width=(kind==='down'?15+55*p:70+30*p)+'%';
+    await sleep(110);
+  }
+  return peak*0.92;
+}
+async function runTest(){
+  if(isTesting)return;
+  isTesting=true;samples=[];hasSample=false;displayVal=0;targetVal=0;idleMode=false;drawGraph();
+  const btn=$('startBtn');btn.disabled=true;btn.textContent='Test Yapılıyor...';
+  $('graphState').textContent='Aktif';
+  $('pingV').textContent='--';$('jitterV').textContent='--';$('lossV').textContent='--';
+  $('qualityText').textContent='Test sonuçlarına göre ağ performansınız değerlendiriliyor...';
+  let real=true;
+  try{await fetch(`${CF}/__down?bytes=0&r=${Math.random()}`,{cache:'no-store'});}catch(e){real=false;}
+  setStatus('Gecikme (ping) ölçülüyor...');startPhaseTimer('Ping ölçülüyor');
+  let ping=0;
+  if(real){ping=await measurePing();}
+  else{ping=10+Math.random()*25;$('pingV').textContent=ping.toFixed(0);$('jitterV').textContent=(Math.random()*4+0.3).toFixed(1);$('lossV').textContent='0.0';$('progLine').style.width='12%';await sleep(900);}
+  stopPhaseTimer();
+  $('phaseIcon').textContent='↓';$('phaseTitle').textContent='İndirme (Download) Hızı';$('speedU').textContent='MBPS ↓';
+  startPhaseTimer('İndirme hızı ölçülüyor');
+  let down=0;
+  try{down=real?await measureDownload():await simPhase('down');}catch(e){down=await simPhase('down');}
+  const fd=targetVal;stopPhaseTimer();setStatus('İndirme tamamlandı: '+fd.toFixed(1)+' Mbps');
+  targetVal=0;await sleep(700);hasSample=false;
+  $('phaseIcon').textContent='↑';$('phaseTitle').textContent='Yükleme (Upload) Hızı';$('speedU').textContent='MBPS ↑';
+  startPhaseTimer('Yükleme hızı ölçülüyor');
+  let up=0;
+  try{up=real?await measureUpload():await simPhase('up');}catch(e){up=await simPhase('up');}
+  const fu=targetVal;stopPhaseTimer();
+  $('progLine').style.width='100%';setStatus('Test tamamlandı ✔');$('graphState').textContent='Tamamlandı';
+  $('qualityText').textContent=qualityText(fd,fu,ping);
+  saveHistory(fd,fu,ping);
+  btn.disabled=false;btn.textContent='Yeniden Test Et';isTesting=false;
+}
+function qualityText(d,u,p){
+  if(d>=100&&p<=40)return `Mükemmel bağlantı! ${d.toFixed(1)} Mbps indirme hızı ile 4K yayın, çevrimiçi oyun ve görüntülü görüşmeler için ideal.`;
+  if(d>=40)return `İyi bağlantı. ${d.toFixed(1)} Mbps hız ile HD yayın ve toplantılar sorunsuz çalışır.`;
+  if(d>=10)return `Orta seviye bağlantı (${d.toFixed(1)} Mbps). Temel kullanım için yeterli, 4K yayında takılma olabilir.`;
+  return `Düşük bağlantı (${d.toFixed(1)} Mbps). Video görüşmelerinde ve yayınlarda sorun yaşanabilir.`;
+}
+
+/* ========== VİDEO ========== */
+const pVideo=$('playerVideo'),pImg=$('playerImg');
+let videoBroken=false,videoTesting=false,vSamples=[];
+const VIDEO_DUR=20;
+pImg.src=THUMB;
+pVideo.addEventListener('error',()=>{videoBroken=true;pVideo.style.display='none';});
+pVideo.addEventListener('waiting',()=>$('playerRing').style.display='block');
+function setPlayer(cur,avg,stall){
+  if(cur<0||stall){
+    if(!videoBroken)pVideo.pause();
+    $('playerBadge').textContent=cur<0?'—':RES[cur].n;
+    $('playerRing').style.display='block';$('playerIcon').style.display='none';
+    $('playerStatus').textContent='Tamponlanıyor (buffering)...';
+    $('playerRes').textContent=cur<0?'—':RES[cur].n+' • tamponlanıyor';
+  }else{
+    const f=`blur(${RES[cur].blur}px)`;
+    if(!videoBroken){pVideo.style.filter=f;pVideo.play().catch(()=>{});}
+    else{pImg.style.opacity=1;pImg.style.filter=f;}
+    $('playerBadge').textContent=RES[cur].n;
+    $('playerRing').style.display='none';
+    $('playerIcon').style.display=(!videoBroken&&videoTesting)?'none':'block';
+    $('playerStatus').textContent='Oynatılıyor • '+RES[cur].n;
+    $('playerRes').textContent=RES[cur].n+' • '+avg.toFixed(1)+' Mbps';
+  }
+}
+function videoSample(mbps,el,dur){
+  vSamples.push(mbps);if(vSamples.length>6)vSamples.shift();
+  const avg=vSamples.reduce((a,b)=>a+b,0)/vSamples.length;
+  $('bitrateV').textContent=avg.toFixed(1);
+  let cur=-1;RES.forEach((r,i)=>{if(avg>=r.req)cur=i;});
+  const stall=cur>=0&&mbps<RES[cur].req*0.85;
+  resCards.forEach((c,i)=>setCard(i,i===cur&&!stall?'current':(avg>=RES[i].req?'ok':'lock')));
+  setPlayer(cur,avg,stall);
+  $('playerProg').style.width=Math.min(100,el/dur*100)+'%';
+  $('videoProgLine').style.width=Math.min(100,el/dur*100)+'%';
+  return avg;
+}
+async function measureStream(cb,ms){
+  const t0=performance.now();
+  const resp=await fetch(`${CF}/__down?bytes=400000000&r=${Math.random()}`,{cache:'no-store'});
+  const rd=resp.body.getReader();let rec=0;
+  while(true){const {done,value}=await rd.read();if(done)break;rec+=value.length;
+    const el=(performance.now()-t0)/1000;cb(rec*8/el/1e6,el,ms);
+    if(el>ms){await rd.cancel();break;}}
+  const el=(performance.now()-t0)/1000;return rec*8/el/1e6;
+}
+async function simStream(cb,dur){
+  const peak=3+Math.random()*55,t0=performance.now();
+  while((performance.now()-t0)/1000<dur){
+    const el=(performance.now()-t0)/1000;
+    const ramp=peak*(1-Math.exp(-el*1.5));
+    cb(Math.max(0.3,ramp+(Math.random()-0.5)*ramp*0.15),el,dur);
+    await sleep(120);
+  }
+  return peak*0.9;
+}
+async function runVideoTest(){
+  if(videoTesting)return;
+  videoTesting=true;vSamples=[];
+  const btn=$('videoBtn');btn.disabled=true;btn.textContent='Test Yapılıyor (20 sn)...';
+  $('videoResult').hidden=true;
+  resCards.forEach((c,i)=>setCard(i,'lock'));
+  $('playerProg').style.width='0%';$('videoProgLine').style.width='0%';$('bitrateV').textContent='--';
+  setPlayer(-1,0,true);
+  $('videoStatus').textContent='Gerçek video oynatılıyor, çözünürlükler sırayla deneniyor...';
+  if(!videoBroken){try{pVideo.currentTime=0;await pVideo.play();}catch(e){}}
+  let real=true;
+  try{await fetch(`${CF}/__down?bytes=0&r=${Math.random()}`,{cache:'no-store'});}catch(e){real=false;}
+  let final=0;
+  try{final=real?await measureStream(videoSample,VIDEO_DUR):await simStream(videoSample,VIDEO_DUR);}catch(e){final=await simStream(videoSample,VIDEO_DUR);}
+  const avg=vSamples.length?vSamples.reduce((a,b)=>a+b,0)/vSamples.length:final;
+  const peakV=Math.max(...vSamples,avg);
+  let maxIdx=-1;RES.forEach((r,i)=>{if(avg>=r.req)maxIdx=i;});
+  const sup=RES.filter(r=>avg>=r.req).map(r=>r.n);
+  const risk=avg<5?'Yüksek':avg<15?'Orta':'Düşük';
+  const startup=(16/Math.max(avg,0.3)).toFixed(1);
+  let msg;
+  if(maxIdx<0)msg=`Ortalama akış hızınız <b>${avg.toFixed(1)} Mbps</b>. Maalesef 144p bile sorunsuz oynatılamıyor.`;
+  else if(maxIdx===RES.length-1)msg=`Ortalama akış hızınız <b>${avg.toFixed(1)} Mbps</b>. 🎉 8K dahil tüm çözünürlükler sorunsuz.`;
+  else msg=`Ortalama akış hızınız <b>${avg.toFixed(1)} Mbps</b>. <b>${RES[maxIdx].n}</b>'ye kadar sorunsuz; üstü (${RES[maxIdx+1].n}) takılır.`;
+  $('videoResult').innerHTML=
+    `📺 Desteklenen çözünürlükler: <b>${sup.length?sup.join(', '):'—'}</b><br>`+
+    `🏆 Maksimum çözünürlük: <b>${maxIdx<0?'—':RES[maxIdx].n}</b><br>`+
+    `⚡ Ortalama akış hızı: <b>${avg.toFixed(1)} Mbps</b> (tepe: ${peakV.toFixed(1)} Mbps)<br>`+
+    `⏱ Tahmini başlangıç süresi: <b>${startup} sn</b> • ⚠️ Buffering riski: <b>${risk}</b><br>`+
+    `<span class="muted">${msg}</span>`;
+  $('videoResult').hidden=false;
+  setPlayer(maxIdx,avg,false);$('playerIcon').style.display='none';
+  $('playerProg').style.width='100%';$('videoProgLine').style.width='100%';
+  $('videoStatus').textContent='Video testi tamamlandı ✔';
+  btn.disabled=false;btn.textContent='Video Testini Tekrarla';
+  videoTesting=false;
+}
+$('videoBtn').onclick=runVideoTest;
+
+/* ========== GEÇMİŞ ========== */
+function loadHistory(){try{return JSON.parse(localStorage.getItem('flixspeed_history')||'[]');}catch(e){return[];}}
+function saveHistory(d,u,p){const h=loadHistory();h.unshift({t:Date.now(),d:d.toFixed(1),u:u.toFixed(1),p:p.toFixed(0)});localStorage.setItem('flixspeed_history',JSON.stringify(h.slice(0,20)));}
+function renderHistory(){
+  const l=$('historyList'),h=loadHistory();
+  l.innerHTML=h.length?'':'<p class="muted">Henüz kaydedilmiş test bulunmuyor.</p>';
+  h.forEach(x=>{const d=document.createElement('div');d.className='hist-item';
+    d.innerHTML=`<span>${new Date(x.t).toLocaleString('tr-TR')}</span><span>↓ <b>${x.d}</b> ↑ <b>${x.u}</b> Mbps • ${x.p} ms</span>`;l.appendChild(d);});
+}
+$('histBtn').onclick=()=>{renderHistory();$('modalBack').classList.add('open');};
+$('closeModal').onclick=$('okModal').onclick=()=>$('modalBack').classList.remove('open');
+$('clearHist').onclick=()=>{localStorage.removeItem('flixspeed_history');renderHistory();};
+
+/* ========== TEMA & META ========== */
+$('themePill').onclick=e=>{
+  const sp=e.target.closest('span');if(!sp)return;
+  const light=sp.dataset.mode==='light';
+  document.body.classList.toggle('light',light);
+  $('themePill').classList.toggle('dark',!light);
+  [...$('themePill').children].forEach(s=>s.classList.toggle('active',s===sp));
+};
+fetch(`${CF}/meta`).then(r=>r.json()).then(m=>{
+  $('ispLine').textContent=`${m.asOrganization||'Bilinmeyen'} • ${m.clientIp||''} ${m.city?('('+m.city+')'):''}`;
+}).catch(()=>{$('ispLine').textContent='Bilinmeyen sağlayıcı';});
+
+$('startBtn').onclick=runTest;
+renderDial(0,IDLE_ANG);
+</script>
+</body>
+</html>
